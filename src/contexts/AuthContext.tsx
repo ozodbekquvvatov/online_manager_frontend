@@ -134,7 +134,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       const response = await axios.get<{ authenticated: boolean; user: User }>(
-        "/api/admin/check-auth"
+        `${API_BASE_URL}/api/admin/check-auth`
       );
 
       if (response.data.authenticated && response.data.user) {
@@ -146,7 +146,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const profileResponse = await axios.get<{
             success: boolean;
             data: Profile;
-          }>("/api/admin/profile");
+          }>(`${API_BASE_URL}/api/admin/profile`);
           if (profileResponse.data.success && profileResponse.data.data) {
             setProfile(profileResponse.data.data);
           }
@@ -168,7 +168,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const refreshProfile = async () => {
     try {
       const response = await axios.get<{ success: boolean; data: Profile }>(
-        "/api/admin/profile"
+        `${API_BASE_URL}/api/admin/profile`
       );
       if (response.data.success && response.data.data) {
         setProfile(response.data.data);
@@ -189,7 +189,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         success: boolean;
         token: string;
         user: User;
-      }>("/api/admin/login", {
+      }>(`${API_BASE_URL}/api/admin/login`, {
         email,
         password,
       });
@@ -209,7 +209,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const profileResponse = await axios.get<{
             success: boolean;
             data: Profile;
-          }>("/api/admin/profile");
+          }>(`${API_BASE_URL}/api/admin/profile`);
           if (profileResponse.data.success && profileResponse.data.data) {
             setProfile(profileResponse.data.data);
           }
@@ -235,7 +235,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signOut = async () => {
     try {
-      await axios.post("/api/admin/logout");
+      await axios.post(`${API_BASE_URL}/api/admin/logout`);
     } catch (error: any) {
     } finally {
       removeToken();
