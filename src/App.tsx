@@ -9,7 +9,7 @@ import { Inventory } from './pages/admin/Inventory';
 import { Employees } from './pages/admin/Employees';
 import { Sales } from './pages/admin/Sales';
 import { Products } from './pages/admin/Products';
-import { Profile } from './pages/admin/Profile';
+import  Profile  from './pages/admin/Profile';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
