@@ -63,7 +63,7 @@ export const Home: React.FC = () => {
   const [productsPerPage] = useState(6);
   const [totalProducts, setTotalProducts] = useState(0);
   const [scrolled, setScrolled] = useState(false);
-  const API_BASE_URL = 'http://127.0.0.1:8000';
+  const API_BASE_URL = 'https://onlinemanagerbackend-production.up.railway.app';
 
   useEffect(() => {
     const handleScroll = () => {

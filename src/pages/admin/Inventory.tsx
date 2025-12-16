@@ -74,7 +74,7 @@ export const Inventory: React.FC = () => {
     return `${margin.toFixed(1)}%`;
   };
 
-  const API_BASE_URL = 'http://127.0.0.1:8000';
+  const API_BASE_URL = 'https://onlinemanagerbackend-production.up.railway.app';
 
   const fetchProducts = async () => {
     try {

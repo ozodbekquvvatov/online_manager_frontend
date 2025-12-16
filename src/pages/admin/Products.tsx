@@ -69,7 +69,7 @@ export const Products: React.FC = () => {
   const calculations = useBusinessCalculations();
   const { profile } = useAuth();
 
-  const API_BASE_URL = 'http://127.0.0.1:8000';
+  const API_BASE_URL = 'https://onlinemanagerbackend-production.up.railway.app';
 
   // Get price for display - use USD value if available
   const getDisplayPrice = (product: ProductWithImages, type: 'cost' | 'selling'): string => {

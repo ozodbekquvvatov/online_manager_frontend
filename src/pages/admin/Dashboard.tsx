@@ -163,7 +163,7 @@ export const Dashboard: React.FC = () => {
   
   const { user, isAuthenticated } = useAuth();
 
-  const API_BASE_URL = 'http://127.0.0.1:8000';
+  const API_BASE_URL = 'https://onlinemanagerbackend-production.up.railway.app';
 
   const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat('en-US', {

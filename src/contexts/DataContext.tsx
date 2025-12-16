@@ -25,7 +25,7 @@ interface DataProviderProps {
   children: React.ReactNode;
 }
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+  const API_BASE_URL = 'https://onlinemanagerbackend-production.up.railway.app';
 
 export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const [employees, setEmployees] = React.useState<any[]>([]);
