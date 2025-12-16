@@ -55,7 +55,6 @@ interface ProductImage {
   image_name: string;
   is_primary: boolean;
 }
-
 export const Home: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +63,7 @@ export const Home: React.FC = () => {
   const [productsPerPage] = useState(6);
   const [totalProducts, setTotalProducts] = useState(0);
   const [scrolled, setScrolled] = useState(false);
+  const API_BASE_URL = 'http://127.0.0.1:8000';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -85,7 +85,7 @@ export const Home: React.FC = () => {
     try {
       setLoading(true);
       
-      const response = await fetch(`/api/products/public?page=${currentPage}&limit=${productsPerPage}`);
+      const response = await fetch(`${API_BASE_URL}/api/products/public?page=${currentPage}&limit=${productsPerPage}`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
