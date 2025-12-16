@@ -305,6 +305,5 @@ export const authFetch = async (url: string, options: RequestInit = {}) => {
   return fetch(url, {
     ...options,
     headers,
-    credentials: "include",
   });
 };
