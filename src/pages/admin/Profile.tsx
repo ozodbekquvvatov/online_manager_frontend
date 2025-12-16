@@ -72,13 +72,14 @@ const Profile: FC = () => {
   useEffect(() => {
     fetchProfile();
   }, []);
+  const API_BASE_URL = 'http://127.0.0.1:8000';
 
   const fetchProfile = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("admin_token");
 
-      const response = await fetch("/api/admin/profile", {
+      const response = await fetch(`${API_BASE_URL}/api/admin/profile`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -111,7 +112,7 @@ const Profile: FC = () => {
       setMessage(null);
 
       const token = localStorage.getItem("admin_token");
-      const response = await fetch("/api/admin/profile", {
+      const response = await fetch(`${API_BASE_URL}/api/admin/profile`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -155,7 +156,7 @@ const Profile: FC = () => {
       }
 
       const token = localStorage.getItem("admin_token");
-      const response = await fetch("/api/admin/change-password", {
+      const response = await fetch(`${API_BASE_URL}/api/admin/change-password`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -207,7 +208,7 @@ const Profile: FC = () => {
       formData.append("avatar", file);
 
       const token = localStorage.getItem("admin_token");
-      const response = await fetch("/api/admin/profile/avatar", {
+      const response = await fetch(`${API_BASE_URL}/api/admin/profile/avatar`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
