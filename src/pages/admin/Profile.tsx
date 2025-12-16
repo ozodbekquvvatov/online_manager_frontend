@@ -48,7 +48,7 @@ interface PasswordChangeData {
   confirm_password: string;
 }
 
-export const Profile: FC = () => {
+const Profile: FC = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -775,3 +775,4 @@ export const Profile: FC = () => {
     </Container>
   );
 };
+export default Profile;
