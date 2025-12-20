@@ -177,56 +177,61 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const signIn = async (email: string, password: string) => {
-  let originalAuthHeader: any = undefined;
+    // Declare here so it's available in both try and catch scopes
+    let originalAuthHeader: any = undefined;
 
-  try {
-    // Remove any existing authorization header for login request
-    originalAuthHeader = axios.defaults.headers.common["Authorization"];
-    delete axios.defaults.headers.common["Authorization"];
+    try {
+      // Remove any existing authorization header for login request
+      originalAuthHeader = axios.defaults.headers.common["Authorization"];
+      delete axios.defaults.headers.common["Authorization"];
 
-    const response = await axios.post<{
-      success: boolean;
-      token: string;
-      user: User;
-    }>(
-      `${API_BASE_URL}/api/admin/login`,
-      {
+      const response = await axios.post<{
+        success: boolean;
+        token: string;
+        user: User;
+      }>(`${API_BASE_URL}/api/admin/login`, {
         email,
         password,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true, // ← ADD THIS LINE
-      }
-    );
+      });
 
-    if (response.data.success && response.data.token) {
-      // Store the token and set axios headers
-      setToken(response.data.token);
-      
-      // Rest of your code...
+      if (response.data.success && response.data.token) {
+        // Store the token and set axios headers
+        setToken(response.data.token);
+
+        // Store user data
+        const userData = response.data.user;
+        localStorage.setItem("user", JSON.stringify(userData));
+        setUser(userData);
+        setIsAuthenticated(true);
+
+        // Fetch profile data
+        try {
+          const profileResponse = await axios.get<{
+            success: boolean;
+            data: Profile;
+          }>(`${API_BASE_URL}/api/admin/profile`);
+          if (profileResponse.data.success && profileResponse.data.data) {
+            setProfile(profileResponse.data.data);
+          }
+        } catch (profileError) {}
+      } else {
+          const responseData = response.data as any;
+        throw new Error(
+         responseData.message || "Login failed - no token in response"
+        );
+      }
+    } catch (error: any) {
+      // Restore original auth header if it existed
+      if (originalAuthHeader) {
+        axios.defaults.headers.common["Authorization"] = originalAuthHeader;
+      }
+
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw error;
     }
-  } catch (error: any) {
-    // Detailed error logging
-    console.error("Login error details:", {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status,
-      headers: error.response?.headers,
-    });
-    
-    if (error.response?.data?.message) {
-      throw new Error(error.response.data.message);
-    } else if (error.response?.status === 500) {
-      throw new Error("Server error - check backend logs");
-    } else if (error.response?.status === 0) {
-      throw new Error("Network error - CORS or server offline");
-    }
-    throw error;
-  }
-};
+  };
 
   const signOut = async () => {
     try {
