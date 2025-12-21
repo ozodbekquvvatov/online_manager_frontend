@@ -177,151 +177,61 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const signIn = async (email: string, password: string) => {
-  console.log('🔐 signIn called:', { email, password });
-  
-  let originalAuthHeader: any = undefined;
+    // Declare here so it's available in both try and catch scopes
+    let originalAuthHeader: any = undefined;
 
-  try {
-    // Remove any existing authorization header for login request
-    originalAuthHeader = axios.defaults.headers.common["Authorization"];
-    delete axios.defaults.headers.common["Authorization"];
-
-    console.log('📤 Sending login request to:', `${API_BASE_URL}/api/admin/login`);
-    
-    const response = await axios.post<{
-      success?: boolean;
-      token?: string;
-      user?: User;
-      message?: string;
-    }>(`${API_BASE_URL}/api/admin/login`, {
-      email,
-      password,
-    });
-
-    console.log('✅ Login response received:', {
-      status: response.status,
-      statusText: response.statusText,
-      data: response.data,
-      dataKeys: Object.keys(response.data)
-    });
-
-    // DEBUG: Log the full response structure
-    console.log('🔍 Response structure analysis:', {
-      hasTokenProperty: 'token' in response.data,
-      tokenValue: response.data.token,
-      hasSuccessProperty: 'success' in response.data,
-      successValue: response.data.success,
-      hasUserProperty: 'user' in response.data,
-      userKeys: response.data.user ? Object.keys(response.data.user) : []
-    });
-
-    // CHECK ALL POSSIBLE TOKEN LOCATIONS
-    let token: string | null = null;
-    
-    // Option 1: Direct token property (your current check)
-    if (response.data.token) {
-      token = response.data.token;
-      console.log('🔑 Token found in response.data.token:', token.substring(0, 20) + '...');
-    }
-    // Option 2: User object has api_token
-    else if (response.data.user?.api_token) {
-      token = response.data.user.api_token;
-      console.log('🔑 Token found in response.data.user.api_token:', token.substring(0, 20) + '...');
-    }
-    // Option 3: Check if success is true but token in different format
-    else if (response.data.success === true) {
-      console.log('⚠️ Success is true but no token found. Checking response structure...');
-      // Try to find token in any property
-      const responseStr = JSON.stringify(response.data);
-      if (responseStr.includes('api_token') || responseStr.includes('token')) {
-        console.log('🔍 Token string found in response, but not at expected location');
-      }
-    }
-
-    if (!token) {
-      console.error('❌ NO TOKEN FOUND IN RESPONSE. Full response:', response.data);
-      console.error('❌ Response keys:', Object.keys(response.data));
-      if (response.data.user) {
-        console.error('❌ User object keys:', Object.keys(response.data.user));
-      }
-      throw new Error('Login failed - no token in response');
-    }
-
-    // Store the token and set axios headers
-    console.log('💾 Storing token:', token.substring(0, 20) + '...');
-    setToken(token);
-
-    // Store user data
-    const userData = response.data.user || {
-      id: 1,
-      name: 'Admin',
-      email: email,
-      role: 'admin'
-    };
-    
-    console.log('👤 User data to store:', userData);
-    localStorage.setItem("user", JSON.stringify(userData));
-    setUser(userData);
-    setIsAuthenticated(true);
-
-    // Try to fetch profile (optional)
     try {
-      console.log('📋 Attempting to fetch profile...');
-      const profileResponse = await axios.get<{
+      // Remove any existing authorization header for login request
+      originalAuthHeader = axios.defaults.headers.common["Authorization"];
+      delete axios.defaults.headers.common["Authorization"];
+
+      const response = await axios.post<{
         success: boolean;
-        data: Profile;
-      }>(`${API_BASE_URL}/api/admin/profile`);
-      
-      if (profileResponse.data.success && profileResponse.data.data) {
-        console.log('✅ Profile fetched successfully');
-        setProfile(profileResponse.data.data);
+        token: string;
+        user: User;
+      }>(`${API_BASE_URL}/api/admin/login`, {
+        email,
+        password,
+      });
+
+      if (response.data.success && response.data.token) {
+        // Store the token and set axios headers
+        setToken(response.data.token);
+
+        // Store user data
+        const userData = response.data.user;
+        localStorage.setItem("user", JSON.stringify(userData));
+        setUser(userData);
+        setIsAuthenticated(true);
+
+        // Fetch profile data
+        try {
+          const profileResponse = await axios.get<{
+            success: boolean;
+            data: Profile;
+          }>(`${API_BASE_URL}/api/admin/profile`);
+          if (profileResponse.data.success && profileResponse.data.data) {
+            setProfile(profileResponse.data.data);
+          }
+        } catch (profileError) {}
+      } else {
+          const responseData = response.data as any;
+        throw new Error(
+         responseData.message || "Login failed - no token in response"
+        );
       }
-    } catch (profileError: any) {
-      console.warn('⚠️ Could not fetch profile:', profileError.message);
-      // This is not critical, continue without profile
-    }
-
-    console.log('✅ Login completed successfully!');
-    return;
-
-  } catch (error: any) {
-    console.error('🔥 signIn ERROR DETAILS:', {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      config: {
-        url: error.config?.url,
-        method: error.config?.method,
-        data: error.config?.data
+    } catch (error: any) {
+      // Restore original auth header if it existed
+      if (originalAuthHeader) {
+        axios.defaults.headers.common["Authorization"] = originalAuthHeader;
       }
-    });
 
-    // Restore original auth header if it existed
-    if (originalAuthHeader) {
-      axios.defaults.headers.common["Authorization"] = originalAuthHeader;
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw error;
     }
-
-    // Better error messages
-    if (error.response?.status === 401) {
-      throw new Error('Invalid email or password');
-    } else if (error.response?.status === 500) {
-      throw new Error('Server error - please try again later');
-    } else if (error.response?.data?.message) {
-      throw new Error(error.response.data.message);
-    } else if (error.message.includes('no token')) {
-      // Add backend response details to the error
-      const backendMsg = error.response?.data ? 
-        ` Backend responded with: ${JSON.stringify(error.response.data)}` : 
-        '';
-      throw new Error(`Login failed - no token in response.${backendMsg}`);
-    } else if (error.message.includes('Network Error')) {
-      throw new Error('Cannot connect to server. Check your internet connection.');
-    } else {
-      throw new Error('Login failed. Please try again.');
-    }
-  }
-};
+  };
 
   const signOut = async () => {
     try {
