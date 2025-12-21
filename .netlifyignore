@@ -1,0 +1,29 @@
+# IGNORE ALL PHP/LARAVEL FILES
+app/
+bootstrap/
+config/
+database/
+public/
+resources/
+routes/
+storage/
+tests/
+vendor/
+artisan
+composer.*
+*.php
+
+# IGNORE LARAVEL SPECIFIC FILES
+phpunit.xml
+server.php
+webpack.mix.js
+.styleci.yml
+.env
+.env.example
+
+# ONLY KEEP REACT FILES
+!src/
+!index.html
+!package.json
+!vite.config.*
+!tsconfig.json
