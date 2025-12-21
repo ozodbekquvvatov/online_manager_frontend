@@ -1,0 +1,19 @@
+/*
+  X-Content-Type-Options: nosniff
+  Content-Type: application/javascript
+
+/*.js
+  Content-Type: application/javascript
+  X-Content-Type-Options: nosniff
+
+/*.jsx
+  Content-Type: application/javascript
+  X-Content-Type-Options: nosniff
+
+/*.ts
+  Content-Type: application/javascript
+  X-Content-Type-Options: nosniff
+
+/*.tsx
+  Content-Type: application/javascript
+  X-Content-Type-Options: nosniff
